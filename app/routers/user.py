@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
-from app.backend.db_depends import get_db
+from backend.db_depends import get_db
 from typing import Annotated
-from app.models import User
-from app.shemas import CreateUser, UpdateUser
+from models import User
+from shemas import CreateUser, UpdateUser
 from sqlalchemy import insert, select, update, delete
 from slugify import slugify
 
@@ -33,7 +33,7 @@ async def create_user(db: Annotated[Session, Depends(get_db)], create_user: Crea
                                    firstname=create_user.firstname,
                                    lastname=create_user.lastname,
                                    age=create_user.age,
-                                   slag=create_user.username))
+                                   slug=slugify(create_user.username)))
     db.commit()
     return {'status_code': status.HTTP_201_CREATED,
             'transaction': 'Successful'}
@@ -48,10 +48,10 @@ async def update_user(db: Annotated[Session, Depends(get_db)], user_id: int, upd
         )
 
     db.execute(update(User).where(User.id == user_id)).values(
-        firstname=create_user.firstname,
-        lastname=create_user.lastname,
-        age=create_user.age,
-        slag=create_user.username)
+        firstname=update_user.firstnamae,
+        lastname=update_user.lastname,
+        age=update_user.age,
+        slag=slugify(update_user.username))
 
     db.commit()
 
