@@ -47,21 +47,19 @@ async def update_user(db: Annotated[Session, Depends(get_db)], user_id: int, upd
             detail='User was not found'
         )
 
-    db.execute(update(User).where(User.id == user_id)).values(
-        firstname=update_user.firstnamae,
+    db.execute(update(User).where(User.id == user_id).values(
+        firstname=update_user.firstname,
         lastname=update_user.lastname,
-        age=update_user.age,
-        slag=slugify(update_user.username))
+        age=update_user.age))
 
     db.commit()
 
-    return {
-        {'status_code': status.HTTP_200_OK,
+    return {'status_code': status.HTTP_200_OK,
          'transaction': 'User update is successful!'}
-    }
+
 
 @router.delete('/delete')
-async def delete_user(db: Annotated[Session, Depends(get_db)], user_id: int, update_user: UpdateUser):
+async def delete_user(db: Annotated[Session, Depends(get_db)], user_id: int):
     user = db.scalars(select(User).where(User.id == user_id))
     if user is None:
         raise HTTPException(
@@ -69,8 +67,7 @@ async def delete_user(db: Annotated[Session, Depends(get_db)], user_id: int, upd
             detail='User was not found'
         )
     db.execute(delete(User).where(User.id == user_id))
+    db.commit()
 
-    return {
-        {'status_code': status.HTTP_200_OK,
+    return {'status_code': status.HTTP_200_OK,
          'transaction': 'User delete is successful!'}
-    }
